@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <Windows.h>
 using namespace std;
 
 void init_map(int** map) {
@@ -28,7 +29,7 @@ int main (void) {
 	int** map;
 	int sum = 0;
 	int dif = 0;
-	int line = 1;
+	int line = 0;
 
 	map = new int*[15];
 
@@ -63,7 +64,8 @@ int main (void) {
 			for (auto iter : numbers) {
 				if (iter > dif) {
 					for (int paint = dif; paint < iter; paint++) {
-						map[line][sum + paint] = 1;
+						if (line < 15) map[line%15][sum + paint] = 1;
+						else map[sum + paint][line%15] = 1;
 					}
 				}
 				sum += iter + 1;
@@ -72,9 +74,11 @@ int main (void) {
 			while (!numbers.empty())
 				numbers.pop_back();
 
+			system("cls");
+			printmap(map);
+			Sleep(300);
 			line++;
 		}
-		printmap(map);
 		readFile.close();
 
 		for (int i = 0; i < 15; i++)
