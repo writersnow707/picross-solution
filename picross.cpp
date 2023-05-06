@@ -7,14 +7,51 @@
 #include <Windows.h>
 using namespace std;
 
-void init_map(int** map) {
+/*
+class picross {
+private:
+public:
+}; */
+int cnt = 0;
+
+int** init_map() {
+	int** arr = new int* [15];
+
+	for (int i = 0; i < 15; i++)
+		arr[i] = new int[15];
+
 	for (int i = 0; i < 15; i++) {
 		for (int j = 0; j < 15; j++) {
-			map[i][j] = 0;
+			arr[i][j] = 0;
 		}
 	}
+	return arr;
 }
+vector<vector<int>> init_list(string fileName) {
+	vector<vector<int>> list(15);
+	ifstream readFile;
+	string str;
+	int line = 0;
 
+	readFile.open(fileName);
+	if (readFile.is_open()) {
+		while (!readFile.eof()) {
+			string str;
+			getline(readFile, str);
+
+			stringstream ss(str);
+
+			while (getline(ss, str, ' '))
+				list[line].push_back(stoi(str));
+
+			line++;
+		}
+		readFile.close();
+	}
+	readFile.close();
+
+	return list;
+}
 void printmap(int** map) {
 	for (int i = 0; i < 15; i++) {
 		for (int j = 0; j < 15; j++)
@@ -22,67 +59,53 @@ void printmap(int** map) {
 		cout << endl;
 	}
 }
-
-int main (void) {
-	vector<int> numbers;
-	ifstream readFile; // input file stream
-	int** map;
+void start_print(int** map, vector<vector<int>> v, int count) {
 	int sum = 0;
-	int dif = 0;
+	int dif = 15;
 	int line = 0;
 
-	map = new int*[15];
+	for (auto iter : v) {
+		sum = iter.size() - 1;
+		for (int i = 0; i < iter.size(); i++)
+			sum += iter[i];
+		dif = 15 - sum;
+		sum = 0;
+		for (int i = 0; i < iter.size(); i++) {
+			if (iter[i] > dif) {
+				for (int paint = dif; paint < iter[i]; paint++) {
+					(count == 0)
+						? (map[sum + paint][line % 15] = 1)
+						: (map[line % 15][sum + paint] = 1);
+				}
+				//cnt += iter[i] - dif;
+			}
+			sum += iter[i] + 1;
+		}
+		system("cls");
+		printmap(map);
+		//cout << line << ((count == 0) ? "열 진행중..." : "행 진행중...") 
+		//	<< ", cnt = " << cnt << endl;
+		Sleep(300);
+		line++;
+	}
+}
+void solution(int** map, vector<vector<int>> c, vector<vector<int>> r) {
+	start_print(map, r, 0);
+	start_print(map, c, 1);
+}
+
+int main(void) {
+	vector<vector<int>> column_list;
+	vector<vector<int>> row_list;
+	int** map;
+
+	map = init_map();
+	column_list = init_list("picross_column.txt");
+	row_list = init_list("picross_row.txt");
+
+	solution(map, column_list, row_list);
 
 	for (int i = 0; i < 15; i++)
-		map[i] = new int[15];
-
-	init_map(map);
-
-	readFile.open("picross.txt");
-
-	if (readFile.is_open())	{
-		while (!readFile.eof()) {
-			sum = 0;
-			dif = 15;
-			string str;
-			getline(readFile, str);
-
-			stringstream ss(str);
-
-			while (getline(ss, str, ' '))
-				numbers.push_back(stoi(str));
-			
-
-			for (auto iter : numbers) 
-				sum += iter;
-
-			sum += numbers.size() - 1;
-			//cout << sum << endl;
-			dif -= sum;
-
-			sum = 0;
-			for (auto iter : numbers) {
-				if (iter > dif) {
-					for (int paint = dif; paint < iter; paint++) {
-						if (line < 15) map[line%15][sum + paint] = 1;
-						else map[sum + paint][line%15] = 1;
-					}
-				}
-				sum += iter + 1;
-			}
-
-			while (!numbers.empty())
-				numbers.pop_back();
-
-			system("cls");
-			printmap(map);
-			Sleep(300);
-			line++;
-		}
-		readFile.close();
-
-		for (int i = 0; i < 15; i++)
-			delete[] map[i];
-	}
+		delete[] map[i];
 	return 0;
 }
