@@ -61,30 +61,54 @@ void printmap(int** map) {
 }
 void start_print(int** map, vector<vector<int>> v, int count) {
 	int sum = 0;
-	int dif = 15;
 	int line = 0;
+	int dif = 0;
+	int center = 7;
+	int x = 0;
 
 	for (auto iter : v) {
-		sum = iter.size() - 1;
-		for (int i = 0; i < iter.size(); i++)
-			sum += iter[i];
-		dif = 15 - sum;
-		sum = 0;
-		for (int i = 0; i < iter.size(); i++) {
-			if (iter[i] > dif) {
-				for (int paint = dif; paint < iter[i]; paint++) {
-					(count == 0)
-						? (map[sum + paint][line % 15] = 1)
-						: (map[line % 15][sum + paint] = 1);
-				}
-				//cnt += iter[i] - dif;
+		if (iter.size() == 1) {
+			if (iter.front() <= center) {
+				line++;
+				continue;
 			}
-			sum += iter[i] + 1;
+			else {
+				dif = iter.front() - center - 1;
+				if (count == 0) {
+					map[center][line % 15] = 1;
+					for (int i = 1; i <= dif; i++)
+						map[center - i][line % 15] = map[center + i][line % 15] = 1;
+				}
+				else {
+					map[line % 15][center] = 1;
+					for (int i = 1; i <= dif; i++)
+						map[line % 15][center - i] = map[line % 15][center + i] = 1;
+				}
+			}
+		}
+		else {
+			sum = 0;
+			dif = 15;
+			for (int i = 0; i < iter.size(); i++)
+				sum += iter[i];
+			sum += iter.size() - 1;
+			dif -= sum;
+			sum = 0;
+			x = 0;
+
+			for (int i = 0; i < iter.size(); i++) {
+				sum += iter[i];
+				for (int j = dif+x; j < sum; j++) {
+					(count == 0)
+						? (map[j][line % 15] = 1)
+						: (map[line % 15][j] = 1);
+				}
+				sum += 1;
+				x = sum;
+			}
 		}
 		system("cls");
 		printmap(map);
-		//cout << line << ((count == 0) ? "열 진행중..." : "행 진행중...") 
-		//	<< ", cnt = " << cnt << endl;
 		Sleep(300);
 		line++;
 	}
