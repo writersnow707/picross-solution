@@ -109,6 +109,8 @@ void start_print(int** map, vector<vector<int>> v, int count) {
 		}
 		system("cls");
 		printmap(map);
+		//cout << line << ((count == 0) ? "열 진행중..." : "행 진행중...") 
+		//	<< ", cnt = " << cnt << endl;
 		Sleep(300);
 		line++;
 	}
